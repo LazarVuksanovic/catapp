@@ -44,13 +44,20 @@ class BreedsListViewModel(
                 .filterIsInstance<BreedsListUiEvent.SearchQueryChanged>()
                 .debounce(1.5.seconds)
                 .collect {
-                    setState { copy(filteredBreeds = breeds.filter { breed ->
-                            if (query == "")
-                                breeds
-                            breed.name.lowercase().contains(query.lowercase())
-                        })
-                    }
+                    applySearchQuery()
                 }
+        }
+    }
+
+    private fun applySearchQuery() {
+        viewModelScope.launch {
+            setState {
+                copy(filteredBreeds = breeds.filter { breed ->
+                    if (query == "")
+                        breeds
+                    breed.name.lowercase().contains(query.lowercase())
+                })
+            }
         }
     }
 
@@ -58,8 +65,6 @@ class BreedsListViewModel(
         viewModelScope.launch {
             events.collect{
                 when (it) {
-                    BreedsListUiEvent.ClearSearch -> Unit
-                    BreedsListUiEvent.CloseSearchMode -> setState { copy(isSearchMode = false) }
                     is BreedsListUiEvent.SearchQueryChanged -> {
                         searchQuery(it.query)
                     }
