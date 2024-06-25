@@ -1,6 +1,7 @@
 package rs.raf.catapp.breeds.details
 
 import rs.raf.catapp.breeds.list.model.BreedUiModel
+import rs.raf.catapp.images.db.Image
 
 data class BreedDetailsState(
     val breedId: String,

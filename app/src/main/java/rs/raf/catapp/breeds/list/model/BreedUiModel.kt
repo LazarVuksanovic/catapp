@@ -1,8 +1,6 @@
 package rs.raf.catapp.breeds.list.model
 
-import kotlinx.serialization.SerialName
-import rs.raf.catapp.breeds.api.model.Image
-import rs.raf.catapp.breeds.api.model.Weight
+import rs.raf.catapp.images.db.Image
 
 data class BreedUiModel(
     val id: String = "",
@@ -14,11 +12,11 @@ data class BreedUiModel(
     val temperament: String,
     val image: Image?,
     val lifeSpan: String,
-    val weight: Weight,
     val rare: Int,
     val affectionLevel: Int,
     val dogFriendly: Int,
     val energyLevel: Int,
     val sheddingLevel: Int,
     val childFriendly: Int,
+    val weight: String?,
 )

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,10 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -41,25 +38,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.VerticalAlignmentLine
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.SubcomposeAsyncImage
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
-import rs.raf.catapp.breeds.domain.BreedData
-import rs.raf.catapp.breeds.list.BreedListState
+import rs.raf.catapp.breeds.db.Breed
 import rs.raf.catapp.breeds.list.model.BreedUiModel
-import rs.raf.catapp.breeds.repository.BreedRepository
 import java.util.UUID
-import java.util.logging.Filter
 
 fun NavGraphBuilder.breedDetails(
     route: String,
@@ -67,29 +56,27 @@ fun NavGraphBuilder.breedDetails(
 ) = composable(
     route = route
 ) { navBackStackEntry ->
-    val dataId = navBackStackEntry.arguments?.getString("dataId")
-    ?: throw IllegalArgumentException("id is required.")
+    val breedDetailsViewModel: BreedDetailsViewModel = hiltViewModel(navBackStackEntry)
 
-    val breedDetailsViewModel = viewModel<BreedDetailsViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if(modelClass.isAssignableFrom((BreedDetailsViewModel::class.java))){
-                    return BreedDetailsViewModel(breedId = dataId) as T
-                } else {
-                    throw IllegalArgumentException()
-                }
-            }
-        }
-    )
     val state by breedDetailsViewModel.state.collectAsState()
 
-    BreedData(
+    Breed(
         id = UUID.randomUUID().toString(),
         name = "",
         origin = "",
         wikipediaUrl = "",
-        description = ""
+        description = "",
+        dogFriendly = 0,
+        affectionLevel = 0,
+        childFriendly = 0,
+        energyLevel = 0,
+        sheddingLevel = 0,
+        lifeSpan = "0-0",
+        altNames = "",
+        image = null,
+        rare = 0,
+        temperament = "",
+        weight = null,
     )
 
     BreedsDetailsScreen(state = state, navController)
@@ -157,17 +144,36 @@ private fun BreedsDataColumn(
                 )
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFa81fde)
+                containerColor = MaterialTheme.colorScheme.primary,
             ),
         )
 
-        data.image?.let { image ->
+        data.image?.url.let { image ->
             SubcomposeAsyncImage(
-                model = image.url,
+                model = image,
                 contentDescription = "Cat Image",
                 loading = { CircularProgressIndicator() },
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate(route = "grid/${data.id}")
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(width = 200.dp, height = 50.dp)
+            ) {
+                Text(text = "Gallery")
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -241,11 +247,11 @@ private fun BreedsDataColumn(
              text = "Life span: " + data.lifeSpan + " years"
          )
 
-         Text(
-             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-             style = MaterialTheme.typography.bodyLarge,
-             text = "Weight: " + data.weight.metric.toString() + "kg"
-         )
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            text = "Weight: " + data.weight.toString() + "kg"
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -427,7 +433,7 @@ private fun NoDataContent(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "There is no data for id '$id'.",
+            text = "There is no data for id '${id}'.",
             fontSize = 18.sp,
         )
     }

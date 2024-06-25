@@ -15,7 +15,6 @@ import rs.raf.catapp.networking.serialization.AppJson
 val okHttpClient = OkHttpClient.Builder()
     .addInterceptor {
         val updatedRequest = it.request().newBuilder()
-            .addHeader("x-api-key", "live_LUyKDggsNFhveXXpHY5w3rqF13xjB1Ot7llnwA1hnLl2kQ50ho3Vr7AxkWtcm2hy")
             .build()
         it.proceed(updatedRequest)
     }
@@ -28,7 +27,7 @@ val okHttpClient = OkHttpClient.Builder()
 
 
 val retrofit: Retrofit = Retrofit.Builder()
-    .baseUrl("https://api.thecatapi.com/v1/")
+    .baseUrl("https://rma.finlab.rs/")
     .client(okHttpClient)
     .addConverterFactory(AppJson.asConverterFactory("application/json".toMediaType()))
     .build()
