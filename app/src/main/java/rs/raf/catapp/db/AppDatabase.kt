@@ -19,7 +19,7 @@ import rs.raf.catapp.users.db.UserDao
         User::class,
         PlayedQuiz::class
     ],
-    version = 7,
+    version = 9,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

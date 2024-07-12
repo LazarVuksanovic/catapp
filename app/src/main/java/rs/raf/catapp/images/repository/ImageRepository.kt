@@ -20,7 +20,7 @@ class ImageRepository @Inject constructor(
 
     suspend fun getBreedImages(id: String): List<Image>{
         var images = database.imageDao().getImagesOfBreed(id)
-        if(images.isEmpty()){
+        if(images.isEmpty() || images.size < 10){
             images = imageApi.getAllBreedImages(breedId = id).map { it.asImageDbModel() }
             database.imageDao().upsertAllImages(images)
             return database.imageDao().getImagesOfBreed(id)

@@ -78,6 +78,7 @@ class QuestionViewModel @Inject constructor(
                             playedQuizRepository.insertPlayedQuiz(it.playedQuiz)
                         }
                     }
+
                     is QuestionUiEvent.Publish -> {
                         withContext(Dispatchers.IO) {
                             val result = leaderboardRepository.postResult(

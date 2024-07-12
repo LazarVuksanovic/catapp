@@ -35,10 +35,6 @@ class AlbumGridViewModel @Inject constructor(
     init {
         fetchAlbums()
         observeImages()
-
-
-        // TODO We want to show album owner name
-        //observeUser()
     }
 
     private fun fetchAlbums() {
